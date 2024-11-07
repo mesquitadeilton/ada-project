@@ -1,20 +1,13 @@
 import express from "express";
-import supabase from "./config/database.js";
+import dbConnection from "./config/database.js"
 import routes from "./routes/index.js";
 
-const checkConnection = async () => {
-    const { data, error } = await supabase.from('alunos').select('*');
-    if (error) {
-        console.error("ERRO: ", error);
-    } else {
-        console.log("Banco de dados: OK");
-    }
-};
-
-checkConnection();
-
 const app = express();
+const port = 3000;
+
+app.listen(port, () => {
+    console.log("Servidor: OK");
+})
+
 app.use(express.json());
 routes(app);
-
-export default app;

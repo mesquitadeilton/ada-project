@@ -6,6 +6,21 @@ dotenv.config();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const dbConnection = createClient(supabaseUrl, supabaseKey);
 
-export default supabase;
+const checkConnection = async () => {
+    const { data, error } = await dbConnection
+        .from('alunos')
+        .select('*')
+        .limit(1);
+        
+    if(error) {
+        console.error("ERRO: ", error);
+    } else {
+        console.log("Banco de dados: OK");
+    }
+};
+
+checkConnection();
+
+export default dbConnection;
