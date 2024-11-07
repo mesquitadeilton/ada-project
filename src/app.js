@@ -1,5 +1,5 @@
 import express from "express";
-import supabase from "../database.js";
+import supabase from "./config/database.js";
 import routes from "./routes/index.js";
 
 const checkConnection = async () => {
@@ -14,6 +14,7 @@ const checkConnection = async () => {
 checkConnection();
 
 const app = express();
+app.use(express.json());
 routes(app);
 
 export default app;

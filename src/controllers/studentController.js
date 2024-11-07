@@ -1,14 +1,14 @@
-import supabase from "../../database.js";
+import supabase from "../config/database.js";
 
 class StudentController {
     static async createStudent(req, res) {
-        const { name, email, password} = req.body;
+        const { name, email, password } = req.body;
     
         try {
-            const newStudent = { name, email, password};
+            const newStudent = { name, email, password };
     
             const { data, error } = await supabase
-                .from('aluno')
+                .from('alunos')
                 .insert([newStudent]);
     
             if(error) {
@@ -28,10 +28,10 @@ class StudentController {
         }
     }
 
-    static async getStudents() {
+    static async getStudents(req, res) {
         try {
             const { data, error } = await supabase
-                .from('aluno')
+                .from('alunos')
                 .select('*');
     
             if(error) {
