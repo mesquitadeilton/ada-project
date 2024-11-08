@@ -10,7 +10,7 @@ const dbConnection = createClient(supabaseUrl, supabaseKey);
 
 const checkConnection = async () => {
     const { data, error } = await dbConnection
-        .from('alunos')
+        .from('aluno')
         .select('*')
         .limit(1);
         

@@ -6,7 +6,7 @@ class StudentController {
 
         try {
             const { data, error } = await dbConnection
-                .from('alunos')
+                .from('aluno')
                 .insert([{ name, email, password }]);
     
             if(error) {
@@ -24,7 +24,7 @@ class StudentController {
     static async getStudents(req, res) {
         try {
             const { data, error } = await dbConnection
-                .from('alunos')
+                .from('aluno')
                 .select('*');
     
             if(error) {
@@ -44,14 +44,14 @@ class StudentController {
         const { name, email, password } = req.body;
 
         try {
-            const updatedStudent = {};
-            if (name) updatedStudent.name = name;
-            if (email) updatedStudent.email = email;
-            if (password) updatedStudent.password = password;
+            const student = {};
+            if (name) student.name = name;
+            if (email) student.email = email;
+            if (password) student.password = password;
 
             const { data, error } = await dbConnection
-                .from('alunos')
-                .update(updatedStudent)
+                .from('aluno')
+                .update(student)
                 .eq('id', id);
 
             if(error) {
@@ -71,7 +71,7 @@ class StudentController {
         
         try {
             const { data, error } = await dbConnection
-                .from('alunos')
+                .from('aluno')
                 .delete()
                 .eq('id', id);
     

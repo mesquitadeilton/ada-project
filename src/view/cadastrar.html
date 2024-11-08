@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+  <div class="card p-4" style="width: 100%; max-width: 400px;">
+    <h3 class="text-center mb-4">Cadastro</h3>
+
+    <!-- Container para alertas -->
+    <div id="alertContainer"></div>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="name">Nome</label>
+        <input type="text" class="form-control" id="name" placeholder="Digite seu nome" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" placeholder="Digite seu email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" class="form-control" id="password" placeholder="Digite sua senha" required>
+      </div>
+
+      <!-- Botão Dropdown para escolher entre Aluno ou Professor -->
+      <div class="form-group">
+        <label for="role">Função</label>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle form-control" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <!-- Texto atualizado dinamicamente -->
+          </button>
+          <div class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#" id="aluno">Aluno</a>
+            <a class="dropdown-item" href="#" id="professor">Professor</a>
+          </div>
+        </div>
+        <input type="hidden" id="role" name="role" value="aluno" required> <!-- Valor inicial é "aluno" -->
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    // Definir a opção inicial no dropdown
+    $('#dropdownMenuButton').text('Aluno'); // "Aluno" será a opção inicial
+    $('#role').val('aluno'); // A função inicial é "aluno"
+
+    // Verificar se houve um erro e exibir o alerta vermelho
+    if (localStorage.getItem('error')) {
+      $('#alertContainer').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Cadastro não realizado. Por favor, tente novamente.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+      localStorage.removeItem('error'); // Limpar o erro do localStorage
+    }
+
+    // Ao selecionar Aluno ou Professor, atualizar o valor do input hidden e o texto do botão
+    $('#aluno').click(function() {
+      $('#role').val('aluno');
+      $('#dropdownMenuButton').text('Aluno');
+    });
+    
+    $('#professor').click(function() {
+      $('#role').val('professor');
+      $('#dropdownMenuButton').text('Professor');
+    });
+
+    // Enviar o formulário com os dados
+    $('#registerForm').submit(function(event) {
+      event.preventDefault(); // Impede o envio do formulário padrão
+
+      const formData = {
+        name: $('#name').val(),
+        email: $('#email').val(),
+        password: $('#password').val(),
+        role: $('#role').val()
+      };
+
+      $.ajax({
+        type: 'POST',
+        url: 'http://localhost:3000/alunos', // URL do seu endpoint
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        success: function(response) {
+          // Redireciona para login com o sucesso
+          window.location.href = 'login.html?cadastro=sucesso';
+        },
+        error: function(xhr, status, error) {
+          // Armazenar o erro no localStorage antes de recarregar a página
+          localStorage.setItem('error', 'true');
+          location.reload(); // Recarregar a página
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
