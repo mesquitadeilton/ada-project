@@ -1,7 +1,9 @@
-const user = {
-    name: '',
-    email: '',
-    password: '',
-};
+class User {
+    constructor({ name, email, password }) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+}
 
-export default user;
+export default User;

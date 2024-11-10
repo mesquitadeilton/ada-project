@@ -13,7 +13,7 @@
     <h3 class="text-center mb-4">Login</h3>
     <!-- Container para alertas -->
     <div id="alertContainer"></div>
-    <form>
+    <form id="loginForm">
       <div class="form-group">
         <label for="email">Email</label>
         <input type="email" class="form-control" id="email" placeholder="Digite seu email">
@@ -31,12 +31,12 @@
   </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-  $(document).ready(function() {
+   $(document).ready(function() {
     // Verificar se o parâmetro de sucesso está na URL
     const urlParams = new URLSearchParams(window.location.search);
     const cadastroStatus = urlParams.get('cadastro');
@@ -45,6 +45,38 @@
     if (cadastroStatus === 'sucesso') {
       $('#alertContainer').html('<div class="alert alert-success alert-dismissible fade show" role="alert">Cadastro realizado com sucesso!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
     }
+
+    // Enviar o formulário via POST
+    $('#loginForm').on('submit', function(event) {
+      event.preventDefault(); // Impedir o envio padrão do formulário
+
+      // Obter os dados do formulário
+      const email = $('#email').val();
+      const password = $('#password').val();
+
+      // Enviar o formulário via POST usando AJAX
+      $.ajax({
+        url: 'http://localhost:3000/login',
+        method: 'POST',
+        data: {
+          email: email,
+          password: password
+        },
+        success: function(response) {
+          // Se a resposta for de sucesso, redireciona para o dashboard
+          if (response.success) {
+            window.location.href = 'dashboard.html'; // Redireciona para o dashboard
+          } else {
+            // Se não for bem-sucedido, exibe a mensagem de erro
+            $('#alertContainer').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Não foi possível fazer login.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+          }
+        },
+        error: function() {
+          // Em caso de erro na requisição AJAX, exibe o alerta de erro
+          $('#alertContainer').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Ocorreu um erro. Tente novamente mais tarde.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+        }
+      });
+    });
   });
 </script>
 

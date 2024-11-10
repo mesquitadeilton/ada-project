@@ -1,22 +1,39 @@
+import bcrypt from 'bcryptjs';
+
 import dbConnection from "../config/database.js";
+import User from "../models/user.js"
 
 class StudentController {
     static async createStudent(req, res) {
         const { name, email, password } = req.body;
 
         try {
-            const { data, error } = await dbConnection
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            const student = new User({ name, email });
+            student.password = hashedPassword;
+
+            const { userData, userError } = await dbConnection
                 .from('aluno')
-                .insert([{ name, email, password }]);
+                .insert([{ name: student.name, email: student.email }]);
     
-            if(error) {
+            if(userError) {
+                console.error("ERRO:", error.message);
+                return res.status(400).json({ ERRO: error.message });;
+            }
+
+            const { authData, authError } = await dbConnection
+                .from('credenciais')
+                .insert([{ email: student.email, password: student.password }]);
+    
+            if(authError) {
                 console.error("ERRO:", error.message);
                 return res.status(400).json({ ERRO: error.message });;
             }
     
             res.status(200).json({ message: "Aluno criado com sucesso" });
         } catch (error) {
-            console.error("ERRO", error.message);
+            console.error("ERRO:", error.message);
             res.status(500).json({ ERRO: error.message });
         }
     }
@@ -29,12 +46,12 @@ class StudentController {
     
             if(error) {
                 console.error("ERRO:", error.message);
-                return res.status(400).json({ ERRO: error.message });;
+                return res.status(400).json({ ERRO: error.message });
             }
     
             res.status(200).json({ Alunos: data });
         } catch (error) {
-            console.error("ERRO", error.message);
+            console.error("ERRO:", error.message);
             res.status(500).json({ ERRO: error.message });
         }
     }
