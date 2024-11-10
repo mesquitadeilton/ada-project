@@ -86,9 +86,15 @@
         role: $('#role').val()
       };
 
+      // Determina a URL baseada na seleção do role
+      let url = 'http://localhost:3000/cadastrar/aluno'; // URL padrão
+      if (formData.role === 'professor') {
+        url = 'http://localhost:3000/cadastrar/professor';
+      }
+
       $.ajax({
         type: 'POST',
-        url: 'http://localhost:3000/alunos', // URL do seu endpoint
+        url: url, // Usar a URL dinâmica
         data: JSON.stringify(formData),
         contentType: 'application/json',
         success: function(response) {

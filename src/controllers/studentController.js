@@ -13,13 +13,14 @@ class StudentController {
             const student = new User({ name, email });
             student.password = hashedPassword;
 
-            const { userData, userError } = await dbConnection
-                .from('aluno')
-                .insert([{ name: student.name, email: student.email }]);
+            const { data, error } = await dbConnection
+                .from('credenciais')
+                .select('*')
+                .eq('email', student.email);
     
-            if(userError) {
-                console.error("ERRO:", error.message);
-                return res.status(400).json({ ERRO: error.message });;
+            if(data) {
+                console.error("Usuário já cadastrado");
+                return res.status(400).json({ message: "Usuário encontrado" });
             }
 
             const { authData, authError } = await dbConnection
@@ -27,6 +28,15 @@ class StudentController {
                 .insert([{ email: student.email, password: student.password }]);
     
             if(authError) {
+                console.error("ERRO:", error.message);
+                return res.status(400).json({ ERRO: error.message });;
+            }
+
+            const { userData, userError } = await dbConnection
+                .from('aluno')
+                .insert([{ name: student.name, email: student.email }]);
+    
+            if(userError) {
                 console.error("ERRO:", error.message);
                 return res.status(400).json({ ERRO: error.message });;
             }

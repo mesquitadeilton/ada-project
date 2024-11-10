@@ -3,8 +3,8 @@ import StudentController from "../controllers/studentController.js";
 
 const router = express.Router();
 
-router.post("/alunos", StudentController.createStudent);
-router.get("/alunos", StudentController.getStudents);
+router.post("/cadastrar/aluno", StudentController.createStudent);
+router.get("/cadastrar/aluno", StudentController.getStudents);
 router.put("/alunos/:id", StudentController.updateStudent);
 router.delete("/alunos/:id", StudentController.deleteStudent);
 
