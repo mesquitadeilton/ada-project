@@ -13,27 +13,17 @@ class StudentController {
             const student = new User({ name, email });
             student.password = hashedPassword;
 
-            const { data, error } = await dbConnection
-                .from('credenciais')
-                .select('*')
-                .eq('email', student.email);
-    
-            if(data) {
-                console.error("Usuário já cadastrado");
-                return res.status(400).json({ message: "Usuário encontrado" });
-            }
-
-            const { authData, authError } = await dbConnection
-                .from('credenciais')
+            const { authData, error } = await dbConnection
+                .from('auth')
                 .insert([{ email: student.email, password: student.password }]);
     
-            if(authError) {
+            if(error) {
                 console.error("ERRO:", error.message);
                 return res.status(400).json({ ERRO: error.message });;
             }
 
             const { userData, userError } = await dbConnection
-                .from('aluno')
+                .from('student')
                 .insert([{ name: student.name, email: student.email }]);
     
             if(userError) {
@@ -51,7 +41,7 @@ class StudentController {
     static async getStudents(req, res) {
         try {
             const { data, error } = await dbConnection
-                .from('aluno')
+                .from('student')
                 .select('*');
     
             if(error) {
@@ -71,13 +61,13 @@ class StudentController {
         const { name, email, password } = req.body;
 
         try {
-            const student = {};
+            const student = new User();
             if (name) student.name = name;
             if (email) student.email = email;
             if (password) student.password = password;
 
             const { data, error } = await dbConnection
-                .from('aluno')
+                .from('student')
                 .update(student)
                 .eq('id', id);
 
@@ -98,7 +88,7 @@ class StudentController {
         
         try {
             const { data, error } = await dbConnection
-                .from('aluno')
+                .from('student')
                 .delete()
                 .eq('id', id);
     

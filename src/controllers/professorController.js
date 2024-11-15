@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import dbConnection from "../config/database.js";
 import User from "../models/user.js"
 
-class ProfessorController {
+class StudentController {
     static async createProfessor(req, res) {
         const { name, email, password } = req.body;
 
@@ -13,14 +13,13 @@ class ProfessorController {
             const professor = new User({ name, email });
             professor.password = hashedPassword;
 
-            const { data, error } = await dbConnection
-                .from('credenciais')
-                .select('*')
-                .eq('email', professor.email);
+            const { authData, error } = await dbConnection
+                .from('auth')
+                .insert([{ email: professor.email, password: professor.password }]);
     
-            if(data) {
-                console.error("Usuário já cadastrado");
-                return res.status(400).json({ message: "Usuário encontrado" });
+            if(error) {
+                console.error("ERRO:", error.message);
+                return res.status(400).json({ ERRO: error.message });;
             }
 
             const { userData, userError } = await dbConnection
@@ -31,17 +30,8 @@ class ProfessorController {
                 console.error("ERRO:", error.message);
                 return res.status(400).json({ ERRO: error.message });;
             }
-
-            const { authData, authError } = await dbConnection
-                .from('credenciais')
-                .insert([{ email: professor.email, password: professor.password }]);
     
-            if(authError) {
-                console.error("ERRO:", error.message);
-                return res.status(400).json({ ERRO: error.message });;
-            }
-    
-            res.status(200).json({ message: "Professor criado com sucesso" });
+            res.status(200).json({ message: "Aluno criado com sucesso" });
         } catch (error) {
             console.error("ERRO:", error.message);
             res.status(500).json({ ERRO: error.message });
@@ -65,6 +55,54 @@ class ProfessorController {
             res.status(500).json({ ERRO: error.message });
         }
     }
+
+    static async updateProfessor(req, res) {
+        const { id } = req.params;
+        const { name, email, password } = req.body;
+
+        try {
+            const professor = new User();
+            if (name) professor.name = name;
+            if (email) professor.email = email;
+            if (password) professor.password = password;
+
+            const { data, error } = await dbConnection
+                .from('professor')
+                .update(professor)
+                .eq('id', id);
+
+            if(error) {
+                console.error("ERRO:", error.message);
+                return res.status(400).json({ ERRO: error.message });
+            }
+
+            return res.status(200).json({ message: "Aluno atualizado com sucesso" });
+        } catch (error) {
+            console.error("ERRO:", error.message);
+            return res.status(500).json({ ERRO: error.message });
+        }
+    }
+
+    static async deleteProfessor(req, res) {
+        const { id } = req.params;
+        
+        try {
+            const { data, error } = await dbConnection
+                .from('professor')
+                .delete()
+                .eq('id', id);
+    
+            if(error) {
+                console.error("ERRO:", error.message);
+                return res.status(400).json({ ERRO: error.message });;
+            }
+    
+            res.status(200).json({ message: "Aluno apagado com sucesso" });
+        } catch (error) {
+            console.error("ERRO:", error.message);
+            res.status(500).json({ ERRO: error.message });
+        }
+    }
 }
 
-export default ProfessorController;
+export default StudentController;

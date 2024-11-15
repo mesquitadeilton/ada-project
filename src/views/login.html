@@ -23,7 +23,7 @@
         <input type="password" class="form-control" id="password" placeholder="Digite sua senha" required>
       </div>
       <button type="submit" class="btn btn-primary btn-block">Entrar</button>
-      <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='cadastrar.html'">Cadastrar</button>
+      <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='http://localhost:3000/cadastrar.html'">Cadastrar</button>
       <div class="text-center mt-3">
         <a href="#">Esqueceu sua senha?</a>
       </div>
@@ -60,9 +60,7 @@
         }),
         contentType: 'application/json',
         success: function (response) {
-          // Lógica de sucesso
-          $('#alertContainer').html('<div class="alert alert-success">Login bem-sucedido!</div>');
-          console.log(response); // Aqui você pode redirecionar ou fazer outra ação
+          window.location.href = 'http://localhost:3000/dashboard.html';
         },
         error: function (xhr, status, error) {
           // Lógica de erro
