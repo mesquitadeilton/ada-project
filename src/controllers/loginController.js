@@ -37,7 +37,6 @@ class LoginController {
                 process.env.JWT_SECRET_KEY, // A chave secreta para o JWT
                 { expiresIn: '1h' } // O token expira em 1 hora
             );
-            localStorage.setItem('authToken', data.token);
             
             res.status(200).json({ 
                 message: 'Login bem-sucedido',

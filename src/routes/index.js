@@ -3,6 +3,7 @@ import path from "path";
 
 import routerStudent from "./studentRoutes.js";
 import routerProfessor from "./professorRouter.js";
+import routerClass from "./classRouter.js";
 import routerLogin from "./loginRouter.js";
 
 const routes = (app) => {
@@ -20,7 +21,8 @@ const routes = (app) => {
     });
 
     app.use(routerStudent);
-    app.use(routerProfessor)
+    app.use(routerProfessor);
+    app.use(routerClass);
     app.use(routerLogin);
 }
 
