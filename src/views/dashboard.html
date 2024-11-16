@@ -5,15 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    /* Garante que a navbar seja dividida corretamente */
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    /* Centraliza o título sem se mover */
+    .navbar-brand {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
 </head>
 <body>
 
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid navbar-container">
+    <!-- Nome Recuperado do localStorage -->
+    <span id="userName" class="navbar-text">
+      <!-- O nome será inserido aqui via JavaScript -->
+    </span>
+
+    <!-- Título Centralizado -->
+    <span class="navbar-brand mb-0 h1">Ambiente Digital de Aprendizagem</span>
+
+    <!-- Botão Sair -->
+    <button id="logoutButton" class="btn btn-danger">Sair</button>
+  </div>
+</nav>
+
+<!-- Corpo da Página -->
 <div class="container d-flex align-items-center justify-content-center min-vh-100">
   <div class="card p-4" style="width: 100%; max-width: 500px;">
     <div id="alertContainer"></div>
-    <div class="text-center">
-      <h3>Bem-vindo ao seu Dashboard</h3>
+    <div class="mt-4">
+      <label for="turmaCodigo">Turma</label>
+      <input type="text" id="turmaCodigo" class="form-control" placeholder="Código da turma">
+      <button id="entrarTurma" class="btn btn-primary mt-3 w-100">Entrar na turma</button>
     </div>
+    <div id="turmasContainer" class="mt-4"></div>
   </div>
 </div>
 
@@ -22,9 +57,28 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-   $(document).ready(function() {
-    // Exibir o alerta de login concluído
-    $('#alertContainer').html('<div class="alert alert-success alert-dismissible fade show" role="alert">Login concluído!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+  // Recupera o nome armazenado no localStorage
+  const userName = localStorage.getItem('name');
+
+  // Verifica se o nome está presente no localStorage
+  if (userName) {
+    // Exibe o nome no elemento com o ID "userName"
+    document.getElementById('userName').textContent = `${userName}`;
+  } else {
+    // Se não houver nome no localStorage, redireciona para a página de login
+    window.location.href = 'http://localhost:3000/login.html';
+  }
+
+  // Lógica para o botão de logout
+  document.getElementById('logoutButton').addEventListener('click', function() {
+    // Remove o nome e o token do localStorage
+    localStorage.removeItem('name');
+    localStorage.removeItem('type');
+    localStorage.removeItem('email');
+    localStorage.removeItem('token');
+    
+    // Redireciona para a página de login
+    window.location.href = 'http://localhost:3000/login.html';
   });
 </script>
 

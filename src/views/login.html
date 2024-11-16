@@ -36,38 +36,46 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-  $(document).ready(function () {
-    // Verifica se o parâmetro 'cadastro=sucesso' está na URL
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('cadastro') === 'sucesso') {
-      $('#alertContainer').html('<div class="alert alert-success">Cadastro realizado com sucesso!</div>');
-    }
+  // Função para exibir alertas
+  function showAlert(message, type) {
+    const alertContainer = document.getElementById('alertContainer');
+    alertContainer.innerHTML = `
+      <div class="alert alert-${type}" role="alert">
+        ${message}
+      </div>
+    `;
+  }
 
-    // Evento de envio do formulário
-    $('#loginForm').submit(function (e) {
-      e.preventDefault(); // Impede o envio padrão do formulário
+  // Lógica para tratar o envio do formulário
+  document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Evita o envio padrão do formulário
 
-      var email = $('#email').val();
-      var password = $('#password').val();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-      // Envia os dados via POST para localhost:3000/login
-      $.ajax({
-        url: 'http://localhost:3000/login',
-        type: 'POST',
-        data: JSON.stringify({
-          email: email,
-          password: password
-        }),
-        contentType: 'application/json',
-        success: function (response) {
-          window.location.href = 'http://localhost:3000/dashboard.html';
-        },
-        error: function (xhr, status, error) {
-          // Lógica de erro
-          $('#alertContainer').html('<div class="alert alert-danger">Erro ao fazer login. Tente novamente!</div>');
-          console.error(error);
+    // Realiza a requisição POST
+    $.ajax({
+      url: 'http://localhost:3000/login',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ email: email, password: password }),
+      success: function(response) {
+        // Verifica se a resposta contém um token (indicando sucesso)
+        if (response && response.token && response.email) {
+          // Salva os dados no localStorage
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('email', response.email);
+          localStorage.setItem('name', response.name); // Salva o nome no localStorage
+          localStorage.setItem('type', response.type); // Salva o tipo no localStorage
+
+          window.location.href = '/dashboard.html'; // Redireciona para o dashboard ou outra página
+        } else {
+          showAlert('Erro ao fazer login. Tente novamente!', 'danger');
         }
-      });
+      },
+      error: function() {
+        showAlert('Erro ao fazer login. Tente novamente!', 'danger');
+      }
     });
   });
 </script>
