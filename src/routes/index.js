@@ -7,6 +7,8 @@ import routerClass from "./classRouter.js";
 import routerLogin from "./loginRouter.js";
 
 const routes = (app) => {
+    app.use(express.static('./src/views'));
+
     app.get("/", (req, res) => {
         res.sendFile(path.resolve("./src/views/login.html"));
     });
@@ -18,6 +20,9 @@ const routes = (app) => {
     });
     app.get("/dashboard.html", (req, res) => {
         res.sendFile(path.resolve("./src/views/dashboard.html"));
+    });
+    app.get("/professor/criar_turma.html", (req, res) => {
+        res.sendFile(path.resolve("./src/views/criar_turma.html"));
     });
 
     app.use(routerStudent);

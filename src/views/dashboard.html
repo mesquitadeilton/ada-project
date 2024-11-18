@@ -6,50 +6,50 @@
   <title>Dashboard</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
-    /* Garante que a navbar seja dividida corretamente */
     .navbar-container {
       display: flex;
       justify-content: space-between;
       width: 100%;
     }
-
-    /* Centraliza o título sem se mover */
     .navbar-brand {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
     }
+    .row {
+      display: flex;
+      justify-content: center;
+      margin: 0; /* Remove o espaço extra entre as linhas */
+    }
+    .card-container {
+      margin-top: 0; /* Remove o espaço superior do card-container */
+    }
+    .card {
+      max-width: 500px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .col-md-12 {
+      display: flex;
+      justify-content: center;
+    }
+    /* Certifique-se de que o conteúdo inserido preenche todo o espaço */
+    .container {
+      padding: 0; /* Remove qualquer padding da container */
+    }
   </style>
 </head>
 <body>
 
-<!-- Header -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid navbar-container">
-    <!-- Nome Recuperado do localStorage -->
-    <span id="userName" class="navbar-text">
-      <!-- O nome será inserido aqui via JavaScript -->
-    </span>
-
-    <!-- Título Centralizado -->
+    <span id="userName" class="navbar-text"></span>
     <span class="navbar-brand mb-0 h1">Ambiente Digital de Aprendizagem</span>
-
-    <!-- Botão Sair -->
     <button id="logoutButton" class="btn btn-danger">Sair</button>
   </div>
 </nav>
 
-<!-- Corpo da Página -->
-<div class="container d-flex align-items-center justify-content-center min-vh-100">
-  <div class="card p-4" style="width: 100%; max-width: 500px;">
-    <div id="alertContainer"></div>
-    <div class="mt-4">
-      <label for="turmaCodigo">Turma</label>
-      <input type="text" id="turmaCodigo" class="form-control" placeholder="Código da turma">
-      <button id="entrarTurma" class="btn btn-primary mt-3 w-100">Entrar na turma</button>
-    </div>
-    <div id="turmasContainer" class="mt-4"></div>
-  </div>
+<div id="content" class="container mt-4">
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -57,27 +57,188 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-  // Recupera o nome armazenado no localStorage
+  // Recupera informações do localStorage
   const userName = localStorage.getItem('name');
+  const userType = localStorage.getItem('type');
+  const userEmail = localStorage.getItem('email'); // Recupera o email do usuário
 
-  // Verifica se o nome está presente no localStorage
+  // Exibe o nome do usuário ou redireciona para o login
   if (userName) {
-    // Exibe o nome no elemento com o ID "userName"
     document.getElementById('userName').textContent = `${userName}`;
   } else {
-    // Se não houver nome no localStorage, redireciona para a página de login
+    window.location.href = 'http://localhost:3000/login.html';
+  }
+
+  // Lógica para carregar conteúdo com base no tipo do usuário
+  const contentDiv = document.getElementById('content');
+
+  if (userType === 'student') {
+    // Carrega divAddClass.html
+    fetch('divAddClass.html')
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao carregar divAddClass.html');
+        return response.text();
+      })
+      .then(html => {
+        contentDiv.innerHTML = html; // Carrega diretamente o conteúdo
+      })
+      .catch(error => console.error(error));
+    
+    // Após o conteúdo de divAddClass.html ser carregado
+    
+    fetch('divAddClass.html')
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao carregar divAddClass.html');
+        return response.text();
+      })
+      .then(html => {
+        contentDiv.innerHTML = html; // Carrega diretamente o conteúdo
+        
+        // Aguardar o carregamento do formulário em divAddClass.html
+        const form = contentDiv.querySelector('form'); // Supondo que o formulário esteja dentro do HTML carregado
+        
+        // Adiciona o evento de 'submit' no formulário
+        // Adiciona o evento de 'submit' no formulário
+        if (form) {
+          form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Previne o envio padrão do formulário
+            
+            // Recupera o valor do campo com id="classCod"
+            const classCod = document.getElementById('classCod').value;
+            
+            // Recupera o email armazenado no localStorage
+            const userEmail = localStorage.getItem('email');
+            
+            // Exibe no log
+            console.log('Class Cod:', classCod); // Exibe o código da classe
+            console.log('Email do usuário:', userEmail); // Exibe o email do usuário
+
+            // Fazendo o POST para adicionar o aluno à turma
+            fetch('http://localhost:3000/turma/adicionar_aluno', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                cod: classCod,  // O código da classe
+                email: userEmail // O email do usuário
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Resposta do servidor:', data); // Exibe a resposta do servidor no console
+              
+              // Atualiza a página após a requisição
+              location.reload();
+            })
+            .catch(error => console.error('Erro ao fazer requisição:', error));
+          });
+        }
+      })
+      .catch(error => console.error(error));
+
+    // Faz uma requisição POST para /professor/turmas com o email do aluno
+    fetch('http://localhost:3000/turmas/aluno', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: userEmail }) // Envia o email do aluno
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (Array.isArray(data.Turmas)) {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('row', 'g-4', 'card-container'); // Adiciona espaçamento entre os cards
+        
+        data.Turmas.forEach(turma => {
+          const cod = turma.cod;
+          const name = turma.name;
+          let description = turma.description || ""; // Verifica se description está vazio
+
+          if (cod && name) {
+            const cardDiv = document.createElement('div');
+            cardDiv.classList.add('col-md-12');
+            cardDiv.innerHTML = `
+              <div class="card w-100">
+                <div class="card-header">${cod}</div>
+                <div class="card-body">
+                  <h5 class="card-title">${name}</h5>
+                  ${description ? `<p class="card-text">${description}</p>` : ''}
+                  <a href="#" class="btn btn-primary">Ver turma</a>
+                </div>
+              </div>
+            `;
+            rowDiv.appendChild(cardDiv);
+          }
+        });
+
+        contentDiv.appendChild(rowDiv);
+      }
+    })
+    .catch(error => console.error('Erro ao fazer requisição:', error));
+  } else if (userType === 'professor') {
+    // Carrega divCreateClass.html
+    fetch('divCreateClass.html')
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao carregar divCreateClass.html');
+        return response.text();
+      })
+      .then(html => {
+        contentDiv.innerHTML = html; // Carrega diretamente o conteúdo
+      })
+      .catch(error => console.error(error));
+
+    // Faz uma requisição POST para /professor/turmas com o email do professor
+    fetch('http://localhost:3000/turmas/professor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: userEmail }) // Envia o email do professor
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (Array.isArray(data.Turmas)) {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('row', 'g-4', 'card-container'); // Adiciona espaçamento entre os cards
+        
+        data.Turmas.forEach(turma => {
+          const cod = turma.cod;
+          const name = turma.name;
+          let description = turma.description || "";
+
+          if (cod && name) {
+            const cardDiv = document.createElement('div');
+            cardDiv.classList.add('col-md-12');
+            cardDiv.innerHTML = `
+              <div class="card w-100">
+                <div class="card-header">${cod}</div>
+                <div class="card-body">
+                  <h5 class="card-title">${name}</h5>
+                  ${description ? `<p class="card-text">${description}</p>` : ''}
+                  <a href="#" class="btn btn-primary">Ver turma</a>
+                </div>
+              </div>
+            `;
+            rowDiv.appendChild(cardDiv);
+          }
+        });
+
+        contentDiv.appendChild(rowDiv);
+      }
+    })
+    .catch(error => console.error('Erro ao fazer requisição:', error));
+  } else {
     window.location.href = 'http://localhost:3000/login.html';
   }
 
   // Lógica para o botão de logout
   document.getElementById('logoutButton').addEventListener('click', function() {
-    // Remove o nome e o token do localStorage
     localStorage.removeItem('name');
     localStorage.removeItem('type');
     localStorage.removeItem('email');
     localStorage.removeItem('token');
-    
-    // Redireciona para a página de login
     window.location.href = 'http://localhost:3000/login.html';
   });
 </script>

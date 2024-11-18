@@ -87,9 +87,9 @@
       };
 
       // Determina a URL baseada na seleção do role
-      let url = 'http://localhost:3000/cadastrar/aluno'; // URL padrão
+      let url = 'http://localhost:3000/aluno/cadastrar'; // URL padrão
       if (formData.role === 'professor') {
-        url = 'http://localhost:3000/cadastrar/professor';
+        url = 'http://localhost:3000/professor/cadastrar';
       }
 
       $.ajax({

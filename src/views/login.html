@@ -46,6 +46,14 @@
     `;
   }
 
+  // Verificar parâmetros na URL (caso seja cadastro com sucesso)
+  window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('cadastro') && urlParams.get('cadastro') === 'sucesso') {
+      showAlert('Cadastro realizado com sucesso!', 'success');
+    }
+  };
+
   // Lógica para tratar o envio do formulário
   document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Evita o envio padrão do formulário
