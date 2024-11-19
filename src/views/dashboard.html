@@ -70,6 +70,11 @@
   } else {
     window.location.href = 'http://localhost:3000/login.html';
   }
+
+  function verTurma(cod) {
+    // Redireciona para a página da turma, passando o código como parâmetro na URL
+    window.location.href = `http://localhost:3000/dashboard/turma.html?cod=${cod}`;
+  }
   
   document.addEventListener('DOMContentLoaded', function () {
     // Verifica se a URL contém o parâmetro `criar_turma=sucesso`
@@ -191,14 +196,6 @@
       })
       .catch(error => console.error(error));
 
-        // Faz uma requisição POST para /professor/turmas com o email do aluno
-        // Faz uma requisição POST para /turmas/aluno com o email do aluno
-        // Função de redirecionamento para a página da turma
-        function verTurma(cod) {
-          // Redireciona para a página da turma, passando o código como parâmetro na URL
-          window.location.href = `http://localhost:3000/dashboard/turma?cod=${cod}`;
-        }
-
         // Faz uma requisição POST para /turmas/aluno com o email do aluno
         fetch('http://localhost:3000/turmas/aluno', {
           method: 'POST',
@@ -273,26 +270,26 @@
         rowDiv.classList.add('row', 'g-4', 'card-container'); // Adiciona espaçamento entre os cards
         
         data.Turmas.forEach(turma => {
-          const cod = turma.cod;
-          const name = turma.name;
-          let description = turma.description || "";
+        const cod = turma.cod;
+        const name = turma.name;
+        let description = turma.description || "";
 
-          if (cod && name) {
-            const cardDiv = document.createElement('div');
-            cardDiv.classList.add('col-md-12');
-            cardDiv.innerHTML = `
-              <div class="card w-100">
-                <div class="card-header">${cod}</div>
-                <div class="card-body">
-                  <h5 class="card-title">${name}</h5>
-                  ${description ? `<p class="card-text">${description}</p>` : ''}
-                  <a href="#" class="btn btn-primary">Ver turma</a>
-                </div>
+        if (cod && name) {
+          const cardDiv = document.createElement('div');
+          cardDiv.classList.add('col-md-12');
+          cardDiv.innerHTML = `
+            <div class="card w-100">
+              <div class="card-header">${cod}</div>
+              <div class="card-body">
+                <h5 class="card-title">${name}</h5>
+                ${description ? `<p class="card-text">${description}</p>` : ''}
+                <a href="javascript:void(0);" class="btn btn-primary" onclick="verTurma('${cod}')">Ver turma</a>
               </div>
-            `;
-            rowDiv.appendChild(cardDiv);
-          }
-        });
+            </div>
+          `;
+          rowDiv.appendChild(cardDiv);
+        }
+      });
 
         contentDiv.appendChild(rowDiv);
       }

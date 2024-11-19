@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .navbar-brand {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .row {
+      display: flex;
+      justify-content: center;
+      margin: 0; /* Remove o espaço extra entre as linhas */
+    }
+    .card-container {
+      margin-top: 0; /* Remove o espaço superior do card-container */
+    }
+    .card {
+      max-width: 500px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .col-md-12 {
+      display: flex;
+      justify-content: center;
+    }
+    /* Certifique-se de que o conteúdo inserido preenche todo o espaço */
+    .container {
+      padding: 0; /* Remove qualquer padding da container */
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid navbar-container">
+    <span id="userName" class="navbar-text"></span>
+    <span class="navbar-brand mb-0 h1">Ambiente Digital de Aprendizagem</span>
+    <button id="logoutButton" class="btn btn-danger">Sair</button>
+  </div>
+</nav>
+
+<div id="alertContainer" class="container mt-3"></div>
+
+<div id="content" class="container mt-4">
+  <!-- O card será inserido aqui -->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  // Recupera informações do localStorage
+  const userName = localStorage.getItem('name');
+  const userType = localStorage.getItem('type');
+  const userEmail = localStorage.getItem('email'); // Recupera o email do usuário
+
+  // Exibe o nome do usuário ou redireciona para o login
+  if (userName) {
+    document.getElementById('userName').textContent = `${userName}`;
+  } else {
+    window.location.href = 'http://localhost:3000/login.html';
+  }
+
+  // Lógica para o botão de logout
+  document.getElementById('logoutButton').addEventListener('click', function() {
+    localStorage.removeItem('name');
+    localStorage.removeItem('type');
+    localStorage.removeItem('email');
+    localStorage.removeItem('token');
+    window.location.href = 'http://localhost:3000/login.html';
+  });
+</script>
+
+</body>
+</html>

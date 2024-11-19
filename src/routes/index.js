@@ -21,6 +21,9 @@ const routes = (app) => {
     app.get("/dashboard.html", (req, res) => {
         res.sendFile(path.resolve("./src/views/dashboard.html"));
     });
+    app.get("/dashboard/turma.html", (req, res) => {
+        res.sendFile(path.resolve("./src/views/turma.html"));
+    });
     app.get("/professor/criar_turma.html", (req, res) => {
         res.sendFile(path.resolve("./src/views/criar_turma.html"));
     });
