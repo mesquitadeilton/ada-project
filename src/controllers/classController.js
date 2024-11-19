@@ -87,6 +87,31 @@ class ClassController {
         }
     }
 
+    static async getClassByCod(req, res) {
+        try {
+            const { cod } = req.query;  // Acessa o parâmetro 'cod' da URL
+            
+            const { data, error } = await dbConnection
+                .from('class')
+                .select('*')
+                .eq('cod', cod);  // Adiciona a condição para buscar pelo código 'cod'
+            
+            if (error) {
+                console.error("ERRO:", error.message);
+                return res.status(400).json({ ERRO: error.message });
+            }
+        
+            if (data.length === 0) {  // Caso não encontre nenhuma turma com esse código
+                return res.status(404).json({ ERRO: "Turma não encontrada" });
+            }
+        
+            res.status(200).json({ Turma: data[0] });  // Retorna a turma encontrada
+        } catch (error) {
+            console.error("ERRO:", error.message);
+            res.status(500).json({ ERRO: error.message });
+        }
+    }
+
     static async getClassesByStudent(req, res) {
         const { email } = req.body;
     
@@ -105,7 +130,7 @@ class ClassController {
             // Agora, busque as turmas com base nos códigos encontrados
             const { data, error } = await dbConnection
                 .from('class')
-                .select('cod, name')
+                .select('cod, name, professor')
                 .in('cod', studentClasses.map(sc => sc.cod)); // Filtra pelas turmas associadas
     
             if (error) {
@@ -113,12 +138,33 @@ class ClassController {
                 return res.status(400).json({ ERRO: error.message });
             }
     
-            res.status(200).json({ Turmas: data });
+            // Agora, para cada turma, busque o nome do professor
+            const updatedClasses = await Promise.all(data.map(async (classItem) => {
+                // Busque o nome do professor a partir do email do professor
+                const { data: professorData, error: professorError } = await dbConnection
+                    .from('professor')
+                    .select('name')
+                    .eq('email', classItem.professor); // Use o email do professor para buscar o nome
+    
+                if (professorError) {
+                    console.error("ERRO ao buscar professor:", professorError.message);
+                    return { ...classItem, professor: 'Professor não encontrado' }; // Em caso de erro, substitui o email por 'Professor não encontrado'
+                }
+    
+                // Substitui o email pelo nome do professor
+                return { 
+                    ...classItem, 
+                    professor: professorData.length > 0 ? professorData[0].name : 'Professor não encontrado' 
+                };
+            }));
+    
+            res.status(200).json({ Turmas: updatedClasses });
+    
         } catch (error) {
             console.error("ERRO:", error.message);
             res.status(500).json({ ERRO: error.message });
         }
-    }
+    }    
     
     static async getClassesByProfessor(req, res) {
         const { email } = req.body;

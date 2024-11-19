@@ -94,6 +94,65 @@
     window.location.href = 'http://localhost:3000/login.html';
   }
 
+  document.addEventListener('DOMContentLoaded', function () {
+    // Manipulador de envio do formulário
+    document.getElementById('registerForm').addEventListener('submit', async function(event) {
+      event.preventDefault(); // Impede o comportamento padrão do formulário
+
+      // Recupera os valores do formulário
+      const cod = document.getElementById('cod').value;
+      const name = document.getElementById('name').value;
+      const description = document.getElementById('description').value;
+      const professor = localStorage.getItem('email'); // Recupera o email do professor
+
+      if (!professor) {
+        alert('Usuário não autenticado. Faça login novamente.');
+        window.location.href = 'http://localhost:3000/login.html';
+        return;
+      }
+
+      // Dados a serem enviados
+      const turmaData = {
+        cod,
+        professor,
+        name,
+        description
+      };
+
+      try {
+        const response = await fetch('http://localhost:3000/turma/criar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(turmaData)
+        });
+
+        if (response.ok) {
+          // Redireciona para o dashboard em caso de sucesso
+          window.location.href = 'http://localhost:3000/dashboard.html?criar_turma=sucesso';
+        } else {
+          // Exibe erro caso a requisição não tenha sido bem-sucedida
+          const errorData = await response.json();
+          const alertContainer = document.getElementById('alertContainer');
+          alertContainer.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+              Erro ao criar turma
+            </div>
+          `;
+        }
+      } catch (error) {
+        // Exibe erro caso ocorra uma falha na conexão
+        const alertContainer = document.getElementById('alertContainer');
+        alertContainer.innerHTML = `
+          <div class="alert alert-danger" role="alert">
+            Erro ao conectar ao servidor: ${error.message}
+          </div>
+        `;
+      }
+    });
+  });
+
   // Lógica para o botão de logout
   document.getElementById('logoutButton').addEventListener('click', function() {
     localStorage.removeItem('name');

@@ -49,6 +49,8 @@
   </div>
 </nav>
 
+<div id="alertContainer" class="container mt-3"></div>
+
 <div id="content" class="container mt-4">
 </div>
 
@@ -68,6 +70,29 @@
   } else {
     window.location.href = 'http://localhost:3000/login.html';
   }
+  
+  document.addEventListener('DOMContentLoaded', function () {
+    // Verifica se a URL contém o parâmetro `criar_turma=sucesso`
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('criar_turma') === 'sucesso') {
+      // Seleciona o container de alertas
+      const alertContainer = document.getElementById('alertContainer');
+
+      // Cria o alerta verde
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-success alert-dismissible fade show';
+      alertDiv.role = 'alert';
+      alertDiv.innerHTML = `
+        Turma criada com sucesso!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      `;
+
+      // Adiciona o alerta ao container
+      alertContainer.appendChild(alertDiv);
+    }
+  });
 
   // Lógica para carregar conteúdo com base no tipo do usuário
   const contentDiv = document.getElementById('content');
@@ -114,6 +139,7 @@
             console.log('Email do usuário:', userEmail); // Exibe o email do usuário
 
             // Fazendo o POST para adicionar o aluno à turma
+            // Após a requisição POST para adicionar o aluno à turma
             fetch('http://localhost:3000/turma/adicionar_aluno', {
               method: 'POST',
               headers: {
@@ -127,9 +153,37 @@
             .then(response => response.json())
             .then(data => {
               console.log('Resposta do servidor:', data); // Exibe a resposta do servidor no console
-              
-              // Atualiza a página após a requisição
-              location.reload();
+
+              // Verifica se a resposta contém uma chave 'message' com a string "Aluno adicionado"
+              if (data.message === 'Aluno adicionado') {
+                // Cria o alerta verde
+                const alertContainer = document.getElementById('alertContainer');
+                if (alertContainer) {
+                  const alertDiv = document.createElement('div');
+                  alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                  alertDiv.role = 'alert';
+                  alertDiv.innerHTML = `
+                    Aluno adicionado à turma com sucesso!
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  `;
+                  alertContainer.appendChild(alertDiv);
+
+                  // Avisa que o alerta foi adicionado
+                  console.log("Alerta exibido com sucesso.");
+
+                  // Aguarda 3 segundos antes de atualizar a página
+                  setTimeout(function() {
+                    location.reload();
+                  }, 3000); // 3000ms = 3 segundos
+                } else {
+                  console.error('Não foi possível encontrar o container de alertas.');
+                }
+              } else {
+                location.reload();
+                console.error('Resposta do servidor não contém a mensagem esperada:', data);
+              }
             })
             .catch(error => console.error('Erro ao fazer requisição:', error));
           });
@@ -137,46 +191,61 @@
       })
       .catch(error => console.error(error));
 
-    // Faz uma requisição POST para /professor/turmas com o email do aluno
-    fetch('http://localhost:3000/turmas/aluno', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email: userEmail }) // Envia o email do aluno
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (Array.isArray(data.Turmas)) {
-        const rowDiv = document.createElement('div');
-        rowDiv.classList.add('row', 'g-4', 'card-container'); // Adiciona espaçamento entre os cards
-        
-        data.Turmas.forEach(turma => {
-          const cod = turma.cod;
-          const name = turma.name;
-          let description = turma.description || ""; // Verifica se description está vazio
+        // Faz uma requisição POST para /professor/turmas com o email do aluno
+        // Faz uma requisição POST para /turmas/aluno com o email do aluno
+        // Função de redirecionamento para a página da turma
+        function verTurma(cod) {
+          // Redireciona para a página da turma, passando o código como parâmetro na URL
+          window.location.href = `http://localhost:3000/dashboard/turma?cod=${cod}`;
+        }
 
-          if (cod && name) {
-            const cardDiv = document.createElement('div');
-            cardDiv.classList.add('col-md-12');
-            cardDiv.innerHTML = `
-              <div class="card w-100">
-                <div class="card-header">${cod}</div>
-                <div class="card-body">
-                  <h5 class="card-title">${name}</h5>
-                  ${description ? `<p class="card-text">${description}</p>` : ''}
-                  <a href="#" class="btn btn-primary">Ver turma</a>
-                </div>
-              </div>
-            `;
-            rowDiv.appendChild(cardDiv);
+        // Faz uma requisição POST para /turmas/aluno com o email do aluno
+        fetch('http://localhost:3000/turmas/aluno', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: userEmail }) // Envia o email do aluno
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Resposta da API:", data); // Verifica o que a API retornou no console
+
+          if (Array.isArray(data.Turmas)) {
+            const rowDiv = document.createElement('div');
+            rowDiv.classList.add('row', 'g-4', 'card-container'); // Adiciona espaçamento entre os cards
+
+            data.Turmas.forEach(turma => {
+              const cod = turma.cod;
+              const name = turma.name;
+              const professor= turma.professor;
+
+              if (cod && name) {
+                const cardDiv = document.createElement('div');
+                cardDiv.classList.add('col-md-12');
+                cardDiv.innerHTML = `
+                  <div class="card w-100">
+                    <div class="card-header">${cod}</div>
+                    <div class="card-body">
+                      <h5 class="card-title">${name}</h5>
+                      <p class="card-text">${professor}</p>
+                      <a href="javascript:void(0);" class="btn btn-primary" onclick="verTurma('${cod}')">Ver turma</a>
+                    </div>
+                  </div>
+                `;
+                rowDiv.appendChild(cardDiv);
+              }
+            });
+
+            contentDiv.appendChild(rowDiv);
+          } else {
+            console.error("A resposta da API não contém um array de turmas:", data);
           }
+        })
+        .catch(error => {
+          console.error('Erro ao fazer requisição:', error);
         });
 
-        contentDiv.appendChild(rowDiv);
-      }
-    })
-    .catch(error => console.error('Erro ao fazer requisição:', error));
   } else if (userType === 'professor') {
     // Carrega divCreateClass.html
     fetch('divCreateClass.html')

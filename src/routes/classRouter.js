@@ -10,4 +10,6 @@ router.get("/turmas", ClassController.getClasses);
 router.post("/turmas/aluno", ClassController.getClassesByStudent);
 router.post("/turmas/professor", ClassController.getClassesByProfessor);
 
+router.get('/dashboard/turma', ClassController.getClassByCod);
+
 export default router;
